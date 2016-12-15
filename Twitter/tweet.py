@@ -36,8 +36,8 @@ class Twitter:
             # tweet_listの中からランダムにツイートを選択する。
             tweet_candidate = random.choice(tweet_list)
 
-            # 直近のツイート最大10件を取得し……
-            get_response = self.oauth_session.get(self.statuses_url + self.user_timeline_endpoint + "?count=10")
+            # 直近のツイート最大20件を取得し……
+            get_response = self.oauth_session.get(self.statuses_url + self.user_timeline_endpoint + "?count=20")
             tweet_json = get_response.json()
 
             # 同じ内容のツイートをしていないか、確認する。
