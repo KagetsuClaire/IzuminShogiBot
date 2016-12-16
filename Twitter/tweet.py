@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from requests_oauthlib import OAuth1Session
-import random
 import json
+import random
+from requests_oauthlib import OAuth1Session
 from Twitter import keys
 
 
@@ -21,7 +21,7 @@ class Twitter:
                                            keys.ACCESS_SECRET)
 
     def random_update(self):
-        # tweet_list.txtを開く。
+        # tweet_list.txtを読み込む。
         f = open(self.tweet_file, 'r', encoding="utf_8_sig")
         tweet_file_data = f.read()
         f.close()
@@ -30,22 +30,29 @@ class Twitter:
         tweet_list_including_garbage = tweet_file_data.split(',')
         tweet_list = list(filter(lambda s: s != '' and s != '\n', tweet_list_including_garbage))
 
+        # 直近のツイート最大20件を取得する。
+        get_response = self.oauth_session.get(self.statuses_url + self.user_timeline_endpoint + "?count=20")
+        tweet_json = get_response.json()
+        recently_tweet_num = len(tweet_json)  # 直近ツイート件数（基本は20件だが、ツイート数が20未満の場合はその数になる）
+
+        # 直近のツイートをリスト形式にする。
+        recently_tweet_list = []
+        i = 0
+        while i < recently_tweet_num:
+            recently_tweet = json.dumps(tweet_json[i]["text"], ensure_ascii=False)
+            recently_tweet_list.append(recently_tweet[1:len(recently_tweet) - 1])
+            i = i + 1
+
         random.seed()
         is_tweet_decision = False  # 何をツイートするか決定したかどうかのフラグ
         while not is_tweet_decision:
             # tweet_listの中からランダムにツイートを選択する。
             tweet_candidate = random.choice(tweet_list)
 
-            # 直近のツイート最大20件を取得し……
-            get_response = self.oauth_session.get(self.statuses_url + self.user_timeline_endpoint + "?count=20")
-            tweet_json = get_response.json()
-
             # 同じ内容のツイートをしていないか、確認する。
             i = 0
-            recently_tweet_num = len(tweet_json)
             while i < recently_tweet_num:
-                recently_tweet = json.dumps(tweet_json[i]["text"], ensure_ascii=False)
-                if recently_tweet[1:len(recently_tweet) - 1] == tweet_candidate:
+                if recently_tweet_list[i] == tweet_candidate:
                     # 直近のツイートに今回のツイート候補が入っていたら選び直す。
                     break
                 i = i + 1
@@ -59,7 +66,7 @@ class Twitter:
 
         # ツイートが正しく送信されたか。
         if post_response.status_code == 200:
-            print("OK")
+            print("Tweet successed")
         else:
             print("Status Code", post_response.status_code)
             post_json = post_response.json()
@@ -67,5 +74,6 @@ class Twitter:
 
     def reply(self):
         pass
+
 
 random_update = Twitter().random_update
