@@ -1,1 +1,1 @@
-bot: python scheduled_tweet.py
+bot: python main.py
