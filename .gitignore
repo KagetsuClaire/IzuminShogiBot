@@ -1,3 +1,7 @@
 Twitter/keys_local.py
 Twitter/__pycache__/
 Contents/quiz.pptx
+Lib/
+Scripts/
+pyvenv.cfg
+pip-selfcheck.json
