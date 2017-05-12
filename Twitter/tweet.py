@@ -27,7 +27,7 @@ class Twitter:
         f.close()
 
         # ファイルから必要なデータのみ取り出す。
-        tweet_list_including_garbage = tweet_file_data.split(',')
+        tweet_list_including_garbage = tweet_file_data.split('"')
         tweet_list = list(filter(lambda s: s != '' and s != '\n', tweet_list_including_garbage))
 
         # 直近のツイート最大20件を取得する。
