@@ -72,6 +72,7 @@ class Twitter:
         # ツイートする。
         try:
             self.api.update_status(new_tweet)
+            print("Tweet succeeded")
         except tweepy.TweepError as e:
             print(e.reason)
 
