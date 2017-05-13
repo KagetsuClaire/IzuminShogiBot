@@ -2,27 +2,33 @@
 
 import json
 import random
-from requests_oauthlib import OAuth1Session
+import tweepy
+# from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
 from Twitter import keys
 
 
-# ツイートクラス
 class Twitter:
-    statuses_url = "https://api.twitter.com/1.1/statuses"
-    user_timeline_endpoint = "/user_timeline.json"
-    mentions_timeline_endpoint = "/mentions_timeline.json"
-    update_endpoint = "/update.json"
-    tweet_file = "Contents/tweet_list.txt"
+    """Twitterクラス"""
 
     def __init__(self):
-        self.oauth_session = OAuth1Session(keys.CONSUMER_KEY,
-                                           keys.CONSUMER_SECRET,
-                                           keys.ACCESS_TOKEN,
-                                           keys.ACCESS_SECRET)
+        # ローカルでテストする際はkeysをコメントアウトし、keys_localのコメントを外す。
+        self.auth = tweepy.OAuthHandler(keys.CONSUMER_KEY, keys.CONSUMER_SECRET)
+        self.auth.set_access_token(keys.ACCESS_TOKEN, keys.ACCESS_SECRET)
+        # self.auth = tweepy.OAuthHandler(keys_local.CONSUMER_KEY, keys_local.CONSUMER_SECRET)
+        # self.auth.set_access_token(keys_local.ACCESS_TOKEN, keys_local.ACCESS_SECRET)
+        self.api = tweepy.API(self.auth)
 
-    def random_update(self):
+    # ツイートリストの中からランダムで1つ選んで返す。
+    def select_tweet_random(self):
+        # main.pyからimportされた場合とコマンドラインから直接実行された場合で、
+        # ツイートリストの相対パスが違うのでここで設定する。
+        if __name__ == '__main__':
+            tweet_file = "../Contents/tweet_list.txt"
+        else:
+            tweet_file = "Contents/tweet_list.txt"
+
         # tweet_list.txtを読み込む。
-        f = open(self.tweet_file, 'r', encoding="utf_8_sig")
+        f = open(tweet_file, 'r', encoding="utf_8_sig")
         tweet_file_data = f.read()
         f.close()
 
@@ -58,22 +64,20 @@ class Twitter:
                 i = i + 1
             else:
                 is_tweet_decision = True
-        else:
-            new_status = {'status': tweet_candidate}
 
+        return tweet_candidate
+
+    # new_tweetを投稿する。
+    def update(self, new_tweet):
         # ツイートする。
-        post_response = self.oauth_session.post(self.statuses_url + self.update_endpoint, data=new_status)
-
-        # ツイートが正しく送信されたか。
-        if post_response.status_code == 200:
-            print("Tweet successed")
-        else:
-            print("Status Code", post_response.status_code)
-            post_json = post_response.json()
-            print("Error  Code", post_json["errors"][0]["code"], ":", post_json["errors"][0]["message"])
+        try:
+            self.api.update_status(new_tweet)
+        except tweepy.TweepError as e:
+            print(e.reason)
 
     def reply(self):
         pass
 
+if __name__ == '__main__':
+    Twitter().update("tweepy test.")
 
-random_update = Twitter().random_update
