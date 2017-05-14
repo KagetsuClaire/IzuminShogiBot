@@ -2,8 +2,10 @@
 
 import random
 import tweepy
+# from pprint import pprint  # デバッグ用
 # from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
 from Twitter import keys
+from Twitter import math
 
 
 class Twitter:
@@ -16,6 +18,7 @@ class Twitter:
         # self.auth = tweepy.OAuthHandler(keys_local.CONSUMER_KEY, keys_local.CONSUMER_SECRET)
         # self.auth.set_access_token(keys_local.ACCESS_TOKEN, keys_local.ACCESS_SECRET)
         self.api = tweepy.API(self.auth)
+        self.previous_reply_id = self.api.mentions_timeline(count=1)[0].id
 
     def user_timeline(self):
         """直近の自分のツイート最大20件を取得し、リスト形式で返す。"""
@@ -81,12 +84,31 @@ class Twitter:
         try:
             self.api.update_status(new_tweet)
             print("Tweet succeeded")
-
         except tweepy.TweepError as e:
             print(e.reason)
 
-    def reply(self):
-        pass
+    def reply_check(self):
+        """リプライに反応する。"""
+
+        # 前回からのリプライをすべて取得する。
+        mentions_statuses = self.api.mentions_timeline(since_id=self.previous_reply_id)
+
+        # リプライに1つずつ対応する。
+        for mention in mentions_statuses:
+            mention_id = mention.id  # リプライ先のツイートID
+            mention_name = mention.author.screen_name  # リプライ相手のスクリーンネーム
+            mention_text = mention.text.split(' ')
+            self.previous_reply_id = mention_id  # 前回リプライのIDを更新
+
+            if mention_text[1].isdigit():
+                num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
+                reply_text = "@" + mention_name + " " + mention_text[1]
+                if math.is_prime(num):
+                    self.api.update_status(status=reply_text + "は素数ね。",
+                                           in_reply_to_status_id=mention_id)
+                else:
+                    self.api.update_status(status=reply_text + "は素数じゃないよ。",
+                                           in_reply_to_status_id=mention_id)
 
 if __name__ == '__main__':
     twitter = Twitter()

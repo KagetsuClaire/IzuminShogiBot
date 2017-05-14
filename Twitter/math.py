@@ -15,7 +15,7 @@ def is_prime(x):
     # 試し割り
     prime = 7
     step = 4
-    while prime <= math.sqrt(x):
+    while prime <= sqrt(x):
         if x % prime == 0:
             return False
         prime += step
