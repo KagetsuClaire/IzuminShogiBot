@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
 import random
 import tweepy
 # from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
@@ -18,8 +17,25 @@ class Twitter:
         # self.auth.set_access_token(keys_local.ACCESS_TOKEN, keys_local.ACCESS_SECRET)
         self.api = tweepy.API(self.auth)
 
-    # ツイートリストの中からランダムで1つ選んで返す。
+    def user_timeline(self):
+        """直近の自分のツイート最大20件を取得し、リスト形式で返す。"""
+
+        user_timeline_status = self.api.user_timeline()
+        recently_tweet_num = len(user_timeline_status)  # 直近ツイート件数（基本は20件だが、ツイート数が20未満の場合はその数になる）
+
+        # 直近のツイートをリスト形式にする。
+        recently_tweet_list = []
+        i = 0
+        while i < recently_tweet_num:
+            recently_tweet = user_timeline_status[i].text
+            recently_tweet_list.append(recently_tweet)
+            i = i + 1
+
+        return recently_tweet_list
+
     def select_tweet_random(self):
+        """ツイートリストの中からランダムで1つ選んで返す。"""
+
         # main.pyからimportされた場合とコマンドラインから直接実行された場合で、
         # ツイートリストの相対パスが違うのでここで設定する。
         if __name__ == '__main__':
@@ -37,17 +53,7 @@ class Twitter:
         tweet_list = list(filter(lambda s: s != '' and s != '\n', tweet_list_including_garbage))
 
         # 直近のツイート最大20件を取得する。
-        get_response = self.oauth_session.get(self.statuses_url + self.user_timeline_endpoint + "?count=20")
-        tweet_json = get_response.json()
-        recently_tweet_num = len(tweet_json)  # 直近ツイート件数（基本は20件だが、ツイート数が20未満の場合はその数になる）
-
-        # 直近のツイートをリスト形式にする。
-        recently_tweet_list = []
-        i = 0
-        while i < recently_tweet_num:
-            recently_tweet = json.dumps(tweet_json[i]["text"], ensure_ascii=False)
-            recently_tweet_list.append(recently_tweet[1:len(recently_tweet) - 1])
-            i = i + 1
+        recently_tweet_list = self.user_timeline()
 
         random.seed()
         is_tweet_decision = False  # 何をツイートするか決定したかどうかのフラグ
@@ -57,6 +63,7 @@ class Twitter:
 
             # 同じ内容のツイートをしていないか、確認する。
             i = 0
+            recently_tweet_num = len(recently_tweet_list)
             while i < recently_tweet_num:
                 if recently_tweet_list[i] == tweet_candidate:
                     # 直近のツイートに今回のツイート候補が入っていたら選び直す。
@@ -67,12 +74,14 @@ class Twitter:
 
         return tweet_candidate
 
-    # new_tweetを投稿する。
     def update(self, new_tweet):
+        """new_tweetを投稿する。"""
+
         # ツイートする。
         try:
             self.api.update_status(new_tweet)
             print("Tweet succeeded")
+
         except tweepy.TweepError as e:
             print(e.reason)
 
@@ -80,5 +89,5 @@ class Twitter:
         pass
 
 if __name__ == '__main__':
-    Twitter().update("tweepy test.")
-
+    twitter = Twitter()
+    twitter.update(twitter.select_tweet_random())
