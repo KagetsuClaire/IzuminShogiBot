@@ -104,15 +104,16 @@ class Twitter:
             self.previous_reply_id = mention_id  # 前回リプライのIDを更新
 
             print("Received reply, id: ", mention_id)
-            print("mention name: ", mention_name)
-            print("message is 「", mention.text, "」")
+            print("Mention Name: ", mention_name)
+            print("Message is 「", mention.text, "」")
 
-            reply_text = ""
             if mention_text[1].isdigit():
                 num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
                 reply_text = self.prime_message("@" + mention_name + " ", num)
-
-            self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
+                self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
+                print("Reply succeeded")
+            else:
+                print("Not reply")
 
     @staticmethod
     def prime_message(screen_name, prime_candidate):
