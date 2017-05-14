@@ -110,16 +110,23 @@ class Twitter:
 
             if mention_text[1].isdigit():
                 num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
-                reply_text = "@" + mention_name + " " + mention_text[1]
+                mention_name = "@" + mention_name + " "
                 if (math.log10(num) + 1) > 15:
-                    self.api.update_status(status="@" + mention_name + " ごめんね。ちょっとわかんないや。",
-                                           in_reply_to_status_id=mention_id)
+                    self.api.update_status(
+                        status=mention_name + "ごめんね。ちょっとわかんないや。",
+                        in_reply_to_status_id=mention_id)
+                elif num is 57:
+                    self.api.update_status(
+                        status=mention_name + "ふふっ、" + mention_text[1] + "はグロタンディーク素数ね。",
+                        in_reply_to_status_id=mention_id)
                 elif prime.is_prime(num):
-                    self.api.update_status(status=reply_text + "は素数ね。",
-                                           in_reply_to_status_id=mention_id)
+                    self.api.update_status(
+                        status=mention_name + mention_text[1] + "は素数ね。",
+                        in_reply_to_status_id=mention_id)
                 else:
-                    self.api.update_status(status=reply_text + "は素数じゃないよ。",
-                                           in_reply_to_status_id=mention_id)
+                    self.api.update_status(
+                        status=mention_name + mention_text[1] + "は素数じゃないよ。",
+                        in_reply_to_status_id=mention_id)
         print("End reply check")
 
 if __name__ == '__main__':
