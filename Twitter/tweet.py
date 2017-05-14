@@ -93,7 +93,6 @@ class Twitter:
     def reply_check(self):
         """リプライに反応する。"""
 
-        print("Start reply check")
         # 前回からのリプライをすべて取得する。
         mentions_statuses = self.api.mentions_timeline(since_id=self.previous_reply_id)
 
@@ -111,18 +110,23 @@ class Twitter:
             reply_text = ""
             if mention_text[1].isdigit():
                 num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
-                reply_text = "@" + mention_name + " "
-                if (math.log10(num) + 1) > 15:
-                    reply_text = reply_text + "ごめんね。ちょっとわかんないや。"
-                elif num is 57:
-                    reply_text = reply_text + "ふふっ、" + mention_text[1] + "はグロタンディーク素数ね。"
-                elif prime.is_prime(num):
-                    reply_text = reply_text + mention_text[1] + "は素数ね。"
-                else:
-                    reply_text = reply_text + mention_text[1] + "は素数じゃないよ。"
+                reply_text = self.prime_message("@" + mention_name + " ", num)
 
             self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
-        print("End reply check")
+
+    @staticmethod
+    def prime_message(screen_name, prime_candidate):
+        """素数判定メッセージを返す。"""
+
+        if (math.log10(prime_candidate) + 1) > 15:
+            reply = screen_name + "ごめんね。ちょっとわからないわ。"
+        elif prime_candidate is 57:
+            reply = screen_name + "ふふっ、" + str(prime_candidate) + "はグロタンディーク素数ね。"
+        elif prime.is_prime(prime_candidate):
+            reply = screen_name + str(prime_candidate) + "は素数ね。"
+        else:
+            reply = screen_name + str(prime_candidate) + "は素数じゃないよ。"
+        return reply
 
 if __name__ == '__main__':
     twitter = Twitter()

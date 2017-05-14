@@ -5,6 +5,7 @@ from math import sqrt
 
 def is_prime(x):
     """引数が素数であるか判定する。"""
+
     if x < 2:  # 2未満は素数ではない。
         return False
     if x == 2 or x == 3 or x == 5:  # 2,3,5は素数である。
