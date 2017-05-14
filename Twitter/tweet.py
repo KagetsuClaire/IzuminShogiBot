@@ -19,6 +19,7 @@ class Twitter:
         # self.auth.set_access_token(keys_local.ACCESS_TOKEN, keys_local.ACCESS_SECRET)
         self.api = tweepy.API(self.auth)
         self.previous_reply_id = self.api.mentions_timeline(count=1)[0].id
+        print("Set previous reply id: ", self.previous_reply_id)
 
     def user_timeline(self):
         """直近の自分のツイート最大20件を取得し、リスト形式で返す。"""
@@ -90,6 +91,7 @@ class Twitter:
     def reply_check(self):
         """リプライに反応する。"""
 
+        print("Start reply check")
         # 前回からのリプライをすべて取得する。
         mentions_statuses = self.api.mentions_timeline(since_id=self.previous_reply_id)
 
@@ -100,6 +102,10 @@ class Twitter:
             mention_text = mention.text.split(' ')
             self.previous_reply_id = mention_id  # 前回リプライのIDを更新
 
+            print("Received reply, id: ", mention_id)
+            print("mention name: ", mention_name)
+            print("message is 「", mention.text, "」")
+
             if mention_text[1].isdigit():
                 num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
                 reply_text = "@" + mention_name + " " + mention_text[1]
@@ -109,6 +115,7 @@ class Twitter:
                 else:
                     self.api.update_status(status=reply_text + "は素数じゃないよ。",
                                            in_reply_to_status_id=mention_id)
+        print("End reply check")
 
 if __name__ == '__main__':
     twitter = Twitter()
