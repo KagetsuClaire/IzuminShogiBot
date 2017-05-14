@@ -12,6 +12,6 @@ while True:
         twitter.update(twitter.select_tweet_random())
     else:
         twitter.reply_check()
-    time.sleep(60)
+    time.sleep(10)
 else:
     print("Exit")

@@ -2,10 +2,12 @@
 
 import random
 import tweepy
+import time
+import math
 # from pprint import pprint  # デバッグ用
 # from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
 from Twitter import keys
-from Twitter import math
+from Twitter import prime
 
 
 class Twitter:
@@ -109,7 +111,10 @@ class Twitter:
             if mention_text[1].isdigit():
                 num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
                 reply_text = "@" + mention_name + " " + mention_text[1]
-                if math.is_prime(num):
+                if (math.log10(num) + 1) > 15:
+                    self.api.update_status(status="@" + mention_name + " ごめんね。ちょっとわかんないや。",
+                                           in_reply_to_status_id=mention_id)
+                elif prime.is_prime(num):
                     self.api.update_status(status=reply_text + "は素数ね。",
                                            in_reply_to_status_id=mention_id)
                 else:
@@ -119,4 +124,7 @@ class Twitter:
 
 if __name__ == '__main__':
     twitter = Twitter()
-    twitter.update(twitter.select_tweet_random())
+    while True:
+        twitter.reply_check()
+        time.sleep(10)
+    # twitter.update(twitter.select_tweet_random())
