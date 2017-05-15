@@ -119,7 +119,7 @@ class Twitter:
     def prime_reply(screen_name, prime_candidate):
         """素数判定メッセージを返す。"""
 
-        if (math.log10(prime_candidate) + 1) > 15:
+        if len(str(prime_candidate)) > 15:
             reply = screen_name + "ごめんね。ちょっとわからないわ。"
         elif prime_candidate is 57:
             reply = screen_name + "ふふっ、" + str(prime_candidate) + "はグロタンディーク素数ね。"
