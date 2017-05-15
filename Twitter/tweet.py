@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+import math
 import random
 import tweepy
-import time
-import math
 # from pprint import pprint  # デバッグ用
 # from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
 from Twitter import keys
@@ -109,14 +109,14 @@ class Twitter:
 
             if mention_text[1].isdigit():
                 num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
-                reply_text = self.prime_message("@" + mention_name + " ", num)
+                reply_text = self.prime_reply("@" + mention_name + " ", num)
                 self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
                 print("Reply succeeded")
             else:
                 print("Not reply")
 
     @staticmethod
-    def prime_message(screen_name, prime_candidate):
+    def prime_reply(screen_name, prime_candidate):
         """素数判定メッセージを返す。"""
 
         if (math.log10(prime_candidate) + 1) > 15:
@@ -129,9 +129,33 @@ class Twitter:
             reply = screen_name + str(prime_candidate) + "は素数じゃないよ。"
         return reply
 
+    @staticmethod
+    def prime_message():
+        """毎日0:00にツイートするその日の素数情報メッセージ"""
+
+        today = datetime.date.today()
+        # 西暦を文字列にして格納
+        today_str = str(today.year)
+
+        # 月を文字列にして連結
+        if (math.log10(today.month) + 1) < 2:
+            today_str = today_str + "0"
+        today_str = today_str + str(today.month)
+
+        # 日を文字列にして連結
+        if (math.log10(today.day) + 1) < 2:
+            today_str = today_str + "0"
+        today_str = today_str + str(today.day)
+        today_number = int(today_str)  # 数値化
+
+        status = "よるほー。大石泉が0時をお知らせするよ。\n今日の日付、\""
+        if prime.is_prime(today_number):
+            status = status + str(today_number) + "\"は素数ね。"
+        else:
+            status = status + str(today_number) + "\"は素数じゃないわね。"
+        return status
+
+
 if __name__ == '__main__':
     twitter = Twitter()
-    while True:
-        twitter.reply_check()
-        time.sleep(10)
-    # twitter.update(twitter.select_tweet_random())
+    print(twitter.prime_message())
