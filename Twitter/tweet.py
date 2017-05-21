@@ -3,6 +3,7 @@
 import datetime
 import math
 import random
+import time
 import tweepy
 # from pprint import pprint  # デバッグ用
 # from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
@@ -107,13 +108,19 @@ class Twitter:
             print("Mention Name: ", mention_name)
             print("Message is 「", mention.text, "」")
 
-            if mention_text[1].isdigit():
-                num = int(mention_text[1])  # [0]にはスクリーンネームが入っているはず
-                reply_text = self.prime_reply("@" + mention_name + " ", num)
-                self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
-                print("Reply succeeded")
+            completed_reply = False
+            for text in mention_text:
+                if text[0] == "@":
+                    pass
+                elif text.isdigit():
+                    num = int(text)
+                    reply_text = self.prime_reply("@" + mention_name + " ", num)
+                    self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
+                    completed_reply = True
+                    print("Reply succeeded")
             else:
-                print("Not reply")
+                if not completed_reply:
+                    print("Not reply")
 
     @staticmethod
     def prime_reply(screen_name, prime_candidate):
@@ -158,4 +165,6 @@ class Twitter:
 
 if __name__ == '__main__':
     twitter = Twitter()
-    print(twitter.prime_message())
+    while True:
+        twitter.reply_check()
+        time.sleep(60)
