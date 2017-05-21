@@ -3,6 +3,7 @@
 import datetime
 import math
 import random
+import re
 import time
 import tweepy
 # from pprint import pprint  # デバッグ用
@@ -109,15 +110,18 @@ class Twitter:
             print("Message is 「", mention.text, "」")
 
             completed_reply = False
-            for text in mention_text:
+            for text in mention_text:  # 送られてきたリプライを空白区切りで処理する。
                 if text[0] == "@":
                     pass
-                elif text.isdigit():
-                    num = int(text)
-                    reply_text = self.prime_reply("@" + mention_name + " ", num)
-                    self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
-                    completed_reply = True
-                    print("Reply succeeded")
+                else:  # 数字のみ取り出す
+                    num_candidate_list = re.split("\D+", text)
+                    for num_candidate in num_candidate_list:
+                        if num_candidate.isdigit():  # 空文字列が入っている可能性があるためチェックする。
+                            num = int(num_candidate)
+                            reply_text = self.prime_reply("@" + mention_name + " ", num)
+                            self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
+                            completed_reply = True
+                            print("Reply succeeded")
             else:
                 if not completed_reply:
                     print("Not reply")
