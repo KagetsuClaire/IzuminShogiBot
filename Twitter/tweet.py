@@ -82,13 +82,16 @@ class Twitter:
 
         return tweet_candidate
 
-    def update(self, new_tweet):
+    def update(self, new_tweet, reply_id=None):
         """new_tweetを投稿する。"""
 
         # ツイートする。
         try:
-            self.api.update_status(new_tweet)
-            print("Tweet succeeded")
+            self.api.update_status(status=new_tweet, in_reply_to_status_id=reply_id)
+            if reply_id is None:
+                print("Tweet succeeded")
+            else:
+                print("Reply succeeded")
         except tweepy.TweepError as e:
             print(e.reason)
 
@@ -119,9 +122,8 @@ class Twitter:
                         if num_candidate.isdigit():  # 空文字列が入っている可能性があるためチェックする。
                             num = int(num_candidate)
                             reply_text = self.prime_reply("@" + mention_name + " ", num)
-                            self.api.update_status(status=reply_text, in_reply_to_status_id=mention_id)
+                            self.update(reply_text, reply_id=mention_id)
                             completed_reply = True
-                            print("Reply succeeded")
             else:
                 if not completed_reply:
                     print("Not reply")
