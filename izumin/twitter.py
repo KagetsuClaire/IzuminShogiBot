@@ -7,9 +7,9 @@ import re
 import time
 import tweepy
 # from pprint import pprint  # デバッグ用
-# from Twitter import keys_local  # ローカルでテストする際はコメントを外す。
-from Twitter import keys
-from Twitter import prime
+# from izumin import keys_local  # ローカルでテストする際はコメントを外す。
+from izumin import keys
+from izumin import math
 
 
 class Twitter:
@@ -136,7 +136,7 @@ class Twitter:
             reply = screen_name + "ごめんね。ちょっとわからないわ。"
         elif prime_candidate is 57:
             reply = screen_name + "ふふっ、" + str(prime_candidate) + "はグロタンディーク素数ね。"
-        elif prime.is_prime(prime_candidate):
+        elif math.is_prime(prime_candidate):
             reply = screen_name + str(prime_candidate) + "は素数ね。"
         else:
             reply = screen_name + str(prime_candidate) + "は素数じゃないよ。"
@@ -162,7 +162,7 @@ class Twitter:
         today_number = int(today_str)  # 数値化
 
         status = "よるほー。大石泉が0時をお知らせするよ。\n今日の日付、\""
-        if prime.is_prime(today_number):
+        if math.is_prime(today_number):
             status = status + str(today_number) + "\"は素数ね。"
         else:
             status = status + str(today_number) + "\"は素数じゃないわね。"

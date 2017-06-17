@@ -3,9 +3,9 @@
 import datetime
 import time
 
-from Twitter import tweet
+from izumin import twitter
 
-twitter = tweet.Twitter()
+twitter = twitter.Twitter()
 while True:
     # ツイートする。
     now = datetime.datetime.now()
