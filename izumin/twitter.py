@@ -6,9 +6,8 @@ import random
 import re
 import time
 import tweepy
-# from pprint import pprint  # デバッグ用
-# from izumin import keys_local  # ローカルでテストする際はコメントを外す。
-from izumin import keys
+from izumin import key
+# from izumin import key_local  # ローカルでテストする際はコメントを外す。
 from izumin import math
 
 
@@ -17,10 +16,10 @@ class Twitter:
 
     def __init__(self):
         # ローカルでテストする際はkeysをコメントアウトし、keys_localのコメントを外す。
-        self.auth = tweepy.OAuthHandler(keys.CONSUMER_KEY, keys.CONSUMER_SECRET)
-        self.auth.set_access_token(keys.ACCESS_TOKEN, keys.ACCESS_SECRET)
-        # self.auth = tweepy.OAuthHandler(keys_local.CONSUMER_KEY, keys_local.CONSUMER_SECRET)
-        # self.auth.set_access_token(keys_local.ACCESS_TOKEN, keys_local.ACCESS_SECRET)
+        self.auth = tweepy.OAuthHandler(key.CONSUMER_KEY, key.CONSUMER_SECRET)
+        self.auth.set_access_token(key.ACCESS_TOKEN, key.ACCESS_SECRET)
+        # self.auth = tweepy.OAuthHandler(key_local.CONSUMER_KEY, key_local.CONSUMER_SECRET)
+        # self.auth.set_access_token(key_local.ACCESS_TOKEN, key_local.ACCESS_SECRET)
         self.api = tweepy.API(self.auth)
         self.previous_reply_id = self.api.mentions_timeline(count=1)[0].id
         print("Set previous reply id: ", self.previous_reply_id)
@@ -121,7 +120,7 @@ class Twitter:
                     for num_candidate in num_candidate_list:
                         if num_candidate.isdigit():  # 空文字列が入っている可能性があるためチェックする。
                             num = int(num_candidate)
-                            reply_text = self.prime_reply("@" + mention_name + " ", num)
+                            reply_text = self.number_reply("@" + mention_name + " ", num)
                             self.update(reply_text, reply_id=mention_id)
                             completed_reply = True
             else:
@@ -129,17 +128,19 @@ class Twitter:
                     print("Not reply")
 
     @staticmethod
-    def prime_reply(screen_name, prime_candidate):
-        """素数判定メッセージを返す。"""
+    def number_reply(screen_name, number):
+        """数字を判定してメッセージを返す。"""
 
-        if len(str(prime_candidate)) > 15:
-            reply = screen_name + "ごめんね。ちょっとわからないわ。"
-        elif prime_candidate is 57:
-            reply = screen_name + "ふふっ、" + str(prime_candidate) + "はグロタンディーク素数ね。"
-        elif math.is_prime(prime_candidate):
-            reply = screen_name + str(prime_candidate) + "は素数ね。"
+        if len(str(number)) > 15:
+            reply = screen_name + "ごめんね。ちょっとわからないな。"
+        elif math.is_perfect_number(number):
+            reply = screen_name + str(number) + "は完全数だね。すっごーい！"
+        elif number is 57:
+            reply = screen_name + "ふふっ、" + str(number) + "はグロタンディーク素数ね。"
+        elif math.is_prime(number):
+            reply = screen_name + str(number) + "は素数ね。"
         else:
-            reply = screen_name + str(prime_candidate) + "は素数じゃないよ。"
+            reply = screen_name + str(number) + "は素数じゃないよ。"
         return reply
 
     @staticmethod

@@ -2,3 +2,4 @@ oauthlib==2.0.2
 requests==2.14.2
 requests-oauthlib==0.8.0
 tweepy==3.5.0
+psycopg2==2.7.1

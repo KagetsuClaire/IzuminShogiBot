@@ -1,8 +1,10 @@
-izumin/key_local.py
-izumin/__pycache__/
+.idea/
 Contents/quiz.pptx
+izumin/__pycache__/
+izumin/db_local.py
+izumin/key_local.py
 Lib/
 Scripts/
 pyvenv.cfg
 pip-selfcheck.json
-.idea/
+Include/

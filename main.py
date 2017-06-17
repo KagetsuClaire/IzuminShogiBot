@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 import time
+from datetime import datetime
 
 from izumin import twitter
 
 twitter = twitter.Twitter()
 while True:
     # ツイートする。
-    now = datetime.datetime.now()
+    now = datetime.now()
     if now.hour % 4 == 0 and now.minute == 0:
         if now.hour == 0:  # 0時
             twitter.update(twitter.prime_message())
@@ -20,7 +20,7 @@ while True:
         twitter.reply_check()
 
     # 一定時間スリープさせる。
-    now = datetime.datetime.now()
+    now = datetime.now()
     if now.hour % 4 == 3 and now.hour != 3 and now.minute == 59:
         # 定期ツイート時間まで1分以内なので時間調整
         time.sleep(60 - now.second)

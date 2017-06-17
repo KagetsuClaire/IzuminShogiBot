@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import psycopg2
+import psycopg2.extras
 from math import sqrt
+
+from izumin import db
+# from izumin import db_local  # ローカルでテストする際はコメントを外す。
 
 
 def is_prime(x):
@@ -24,6 +29,33 @@ def is_prime(x):
 
     return True
 
+
+def is_perfect_number(x):
+    """引数が完全数であるか判定する。"""
+
+    connection = psycopg2.connect(database=db.DATABASE_NAME,
+                                  user=db.DATABASE_USER,
+                                  password=db.DATABASE_PASSWORD,
+                                  host=db.DATABASE_HOST,
+                                  port=db.DATABASE_PORT)
+    # connection = psycopg2.connect(database=db_local.DATABASE_NAME,
+    #                               user=db_local.DATABASE_USER,
+    #                               password=db_local.DATABASE_PASSWORD,
+    #                               host=db_local.DATABASE_HOST,
+    #                               port=db_local.DATABASE_PORT)
+
+    dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    dict_cur.execute("SELECT number FROM perfect_number")
+    for row in dict_cur:
+        if x == row["number"]:
+            return True
+    else:
+        return False
+
+
 if __name__ == '__main__':
-    pass
+    if is_perfect_number(28):
+        print("True")
+    else:
+        print("False")
 
