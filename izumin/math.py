@@ -33,6 +33,7 @@ def is_prime(x):
 def is_perfect_number(x):
     """引数が完全数であるか判定する。"""
 
+    # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
     connection = psycopg2.connect(database=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,

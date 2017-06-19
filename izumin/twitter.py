@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import math
 import random
 import re
 import time
 import tweepy
-from izumin import key
-# from izumin import key_local  # ローカルでテストする際はコメントを外す。
+
+from izumin import key        # 本番環境ではこちら
+# from izumin import key_local  # ローカルではこちら
 from izumin import math
 
 
@@ -15,7 +15,7 @@ class Twitter:
     """Twitterクラス"""
 
     def __init__(self):
-        # ローカルでテストする際はkeysをコメントアウトし、keys_localのコメントを外す。
+        # ローカルでテストする際はkeyをコメントアウトし、key_localのコメントを外す。
         self.auth = tweepy.OAuthHandler(key.CONSUMER_KEY, key.CONSUMER_SECRET)
         self.auth.set_access_token(key.ACCESS_TOKEN, key.ACCESS_SECRET)
         # self.auth = tweepy.OAuthHandler(key_local.CONSUMER_KEY, key_local.CONSUMER_SECRET)
@@ -152,12 +152,12 @@ class Twitter:
         today_str = str(today.year)
 
         # 月を文字列にして連結
-        if (math.log10(today.month) + 1) < 2:
+        if len(str(today.month)) < 2:
             today_str = today_str + "0"
         today_str = today_str + str(today.month)
 
         # 日を文字列にして連結
-        if (math.log10(today.day) + 1) < 2:
+        if len(str(today.day)) < 2:
             today_str = today_str + "0"
         today_str = today_str + str(today.day)
         today_number = int(today_str)  # 数値化
