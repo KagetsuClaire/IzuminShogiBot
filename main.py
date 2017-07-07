@@ -10,12 +10,14 @@ while True:
     # ツイートする。
     now = datetime.now()
     if now.hour % 4 == 0 and now.minute == 0:
-        if now.hour == 0:  # 0時
+        if now.hour == 0:  # 0時：よるほー＆素数メッセージ
             twitter.update(twitter.prime_message())
-        elif now.hour != 4:  # 0,4時以外
-            twitter.update(twitter.select_tweet_random())
-        else:  # 4時はスキップ
+        elif now.hour == 4:  # 4時：スキップ
             pass
+        elif now.hour == 20:  # 20時：帰宅ツイート
+            twitter.update(twitter.select_tweet_random("go_home_tweet.txt"))
+        else:  # それ以外：定期ツイート
+            twitter.update(twitter.select_tweet_random("regularly_tweet.txt"))
     else:  # それ以外の時間はリプライが来ていないかチェックする。
         twitter.reply_check()
 

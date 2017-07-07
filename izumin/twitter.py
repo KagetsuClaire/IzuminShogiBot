@@ -40,17 +40,17 @@ class Twitter:
 
         return recently_tweet_list
 
-    def select_tweet_random(self):
+    def select_tweet_random(self, file_name):
         """ツイートリストの中からランダムで1つ選んで返す。"""
 
         # main.pyからimportされた場合とコマンドラインから直接実行された場合で、
         # ツイートリストの相対パスが違うのでここで設定する。
         if __name__ == '__main__':
-            tweet_file = "../Contents/tweet_list.txt"
+            tweet_file = "../Contents/" + file_name
         else:
-            tweet_file = "Contents/tweet_list.txt"
+            tweet_file = "Contents/" + file_name
 
-        # tweet_list.txtを読み込む。
+        # ツイートリストが含まれたテキストファイルを読み込む。
         f = open(tweet_file, 'r', encoding="utf_8_sig")
         tweet_file_data = f.read()
         f.close()
