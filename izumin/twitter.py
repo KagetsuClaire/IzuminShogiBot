@@ -162,7 +162,7 @@ class Twitter:
         today_str = today_str + str(today.day)
         today_number = int(today_str)  # 数値化
 
-        status = "よるほー。大石泉が0時をお知らせするよ。\n今日の日付、\""
+        status = "よるほー。大石泉が0時をお知らせするよ。今日の日付、\""
         if math.is_prime(today_number):
             status = status + str(today_number) + "\"は素数ね。"
         else:
