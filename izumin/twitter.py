@@ -46,9 +46,9 @@ class Twitter:
         # main.pyからimportされた場合とコマンドラインから直接実行された場合で、
         # ツイートリストの相対パスが違うのでここで設定する。
         if __name__ == '__main__':
-            tweet_file = "../Contents/" + file_name
+            tweet_file = "../contents/" + file_name
         else:
-            tweet_file = "Contents/" + file_name
+            tweet_file = "contents/" + file_name
 
         # ツイートリストが含まれたテキストファイルを読み込む。
         f = open(tweet_file, 'r', encoding="utf_8_sig")
