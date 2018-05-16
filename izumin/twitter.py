@@ -24,7 +24,7 @@ class Twitter:
         self.previous_reply_id = self.api.mentions_timeline(count=1)[0].id
         print("Set previous reply id: ", self.previous_reply_id)
 
-    def user_timeline(self):
+    def get_user_timeline(self):
         """直近の自分のツイート最大20件を取得し、リスト形式で返す。"""
 
         user_timeline_status = self.api.user_timeline()
@@ -60,10 +60,11 @@ class Twitter:
         tweet_list = list(filter(lambda s: s != '' and s != '\n', tweet_list_including_garbage))
 
         # 直近のツイート最大20件を取得する。
-        recently_tweet_list = self.user_timeline()
+        recently_tweet_list = self.get_user_timeline()
 
         random.seed()
         is_tweet_decision = False  # 何をツイートするか決定したかどうかのフラグ
+        tweet_candidate = ""
         while not is_tweet_decision:
             # tweet_listの中からランダムにツイートを選択する。
             tweet_candidate = random.choice(tweet_list)
@@ -120,7 +121,7 @@ class Twitter:
                     for num_candidate in num_candidate_list:
                         if num_candidate.isdigit():  # 空文字列が入っている可能性があるためチェックする。
                             num = int(num_candidate)
-                            reply_text = self.number_reply("@" + mention_name + " ", num)
+                            reply_text = self.make_number_reply("@" + mention_name + " ", num)
                             self.update(reply_text, reply_id=mention_id)
                             completed_reply = True
             else:
@@ -128,45 +129,48 @@ class Twitter:
                     print("Not reply")
 
     @staticmethod
-    def number_reply(screen_name, number):
+    def make_number_reply(screen_name, number):
         """数字を判定してメッセージを返す。"""
 
+        reply = screen_name
         if len(str(number)) > 15:
-            reply = screen_name + "ごめんね。ちょっとわからないな。"
+            reply += "ごめんね。ちょっとわからないな。"
         elif math.is_perfect_number(number):
-            reply = screen_name + str(number) + "は完全数だね。すっごーい！"
+            reply += str(number) + "は完全数だね。すっごーい！"
         elif number is 57:
-            reply = screen_name + "ふふっ、" + str(number) + "はグロタンディーク素数ね。"
+            reply += "ふふっ、" + str(number) + "はグロタンディーク素数ね。"
         elif math.is_prime(number):
-            reply = screen_name + str(number) + "は素数ね。"
+            reply += str(number) + "は素数ね。"
         else:
-            reply = screen_name + str(number) + "は素数じゃないよ。"
+            reply += str(number) + "は素数じゃないよ。"
         return reply
 
     @staticmethod
-    def prime_message():
-        """毎日0:00にツイートするその日の素数情報メッセージ"""
+    def make_prime_message():
+        """毎日0:00にツイートするその日のよるほー＆素数情報メッセージを作成して返す。"""
 
         today = datetime.date.today()
         # 西暦を文字列にして格納
-        today_str = str(today.year)
+        year = str(today.year)
 
-        # 月を文字列にして連結
+        # 月を文字列にして格納
+        month = ""
         if len(str(today.month)) < 2:
-            today_str = today_str + "0"
-        today_str = today_str + str(today.month)
+            month = "0"
+        month += str(today.month)
 
-        # 日を文字列にして連結
+        # 日を文字列にして格納
+        day = ""
         if len(str(today.day)) < 2:
-            today_str = today_str + "0"
-        today_str = today_str + str(today.day)
-        today_number = int(today_str)  # 数値化
+            day = "0"
+        day += str(today.day)
+        today_number = int(year + month + day)  # 連結＆数値化
 
-        status = "よるほー。大石泉が0時をお知らせするよ。今日の日付、\""
+        status = "よるほー。大石泉が0時をお知らせするよ。今日の日付、\"" + str(today_number)
         if math.is_prime(today_number):
-            status = status + str(today_number) + "\"は素数ね。"
+            status += "\"は素数ね。"
         else:
-            status = status + str(today_number) + "\"は素数じゃないわね。"
+            status += "\"は素数じゃないわね。"
         return status
 
 

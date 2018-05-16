@@ -11,7 +11,7 @@ while True:
     now = datetime.now()
     if now.hour % 4 == 0 and now.minute == 0:
         if now.hour == 0:  # 0時：よるほー＆素数メッセージ
-            twitter.update(twitter.prime_message())
+            twitter.update(twitter.make_prime_message())
         elif now.hour == 4:  # 4時：スキップ
             pass
         elif now.hour == 20:  # 20時：帰宅ツイート
