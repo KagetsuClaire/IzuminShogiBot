@@ -15,9 +15,9 @@ while True:
         elif now.hour == 4:  # 4時：スキップ
             pass
         elif now.hour == 20:  # 20時：帰宅ツイート
-            twitter.update(twitter.select_tweet_random("go_home_tweet.txt"))
+            twitter.update(twitter.select_go_home_tweet_random())
         else:  # それ以外：定期ツイート
-            twitter.update(twitter.select_tweet_random("regularly_tweet.txt"))
+            twitter.update(twitter.select_tweet_random())
     else:  # それ以外の時間はリプライが来ていないかチェックする。
         twitter.reply_check()
 

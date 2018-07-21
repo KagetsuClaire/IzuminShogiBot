@@ -1,63 +1,74 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+import psycopg2
+import psycopg2.extras
 import random
 import re
-import time
 import tweepy
+from datetime import datetime, date
 
+from izumin import db        # 本番環境ではこちら
+# from izumin import db_local  # ローカルではこちら
 from izumin import key        # 本番環境ではこちら
 # from izumin import key_local  # ローカルではこちら
 from izumin import math
 
 
 class Twitter:
-    """Twitterクラス"""
+    """
+    Twitterに関する操作を行うクラス
+    """
 
     def __init__(self):
         # ローカルでテストする際はkeyをコメントアウトし、key_localのコメントを外す。
-        self.auth = tweepy.OAuthHandler(key.CONSUMER_KEY, key.CONSUMER_SECRET)
-        self.auth.set_access_token(key.ACCESS_TOKEN, key.ACCESS_SECRET)
-        # self.auth = tweepy.OAuthHandler(key_local.CONSUMER_KEY, key_local.CONSUMER_SECRET)
-        # self.auth.set_access_token(key_local.ACCESS_TOKEN, key_local.ACCESS_SECRET)
-        self.api = tweepy.API(self.auth)
-        self.previous_reply_id = self.api.mentions_timeline(count=1)[0].id
-        print("Set previous reply id: ", self.previous_reply_id)
+        self._auth = tweepy.OAuthHandler(key.CONSUMER_KEY, key.CONSUMER_SECRET)
+        self._auth.set_access_token(key.ACCESS_TOKEN, key.ACCESS_SECRET)
+        # self._auth = tweepy.OAuthHandler(key_local.CONSUMER_KEY, key_local.CONSUMER_SECRET)
+        # self._auth.set_access_token(key_local.ACCESS_TOKEN, key_local.ACCESS_SECRET)
+        self._api = tweepy.API(self._auth)
+        self._previous_reply_id = self._api.mentions_timeline(count=1)[0].id
+        print("Set previous reply id: ", self._previous_reply_id)
 
     def get_user_timeline(self):
-        """直近の自分のツイート最大20件を取得し、リスト形式で返す。"""
+        """
+        直近の自分のツイート最大20件を取得し、リスト形式にして返す。
+        :return: 直近の自分のツイート最大20件のリスト
+        """
 
-        user_timeline_status = self.api.user_timeline()
+        user_timeline_status = self._api.user_timeline()
         recently_tweet_num = len(user_timeline_status)  # 直近ツイート件数（基本は20件だが、ツイート数が20未満の場合はその数になる）
 
         # 直近のツイートをリスト形式にする。
         recently_tweet_list = []
-        i = 0
-        while i < recently_tweet_num:
+        for i in range(0, recently_tweet_num):
             recently_tweet = user_timeline_status[i].text
             recently_tweet_list.append(recently_tweet)
-            i = i + 1
 
         return recently_tweet_list
 
-    def select_tweet_random(self, file_name):
-        """ツイートリストの中からランダムで1つ選んで返す。"""
+    def select_tweet_random(self):
+        """
+        引数で指定されたファイルに保存されているツイート候補からランダムで1つ選んで返す。
+        :return: ランダムに選ばれたツイート文字列
+        """
 
-        # main.pyからimportされた場合とコマンドラインから直接実行された場合で、
-        # ツイートリストの相対パスが違うのでここで設定する。
-        if __name__ == '__main__':
-            tweet_file = "../contents/" + file_name
-        else:
-            tweet_file = "contents/" + file_name
+        tweet_time = datetime.now().strftime("%H:%M:%S")
+        # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
+        connection = psycopg2.connect(dbname=db.DATABASE_NAME,
+                                      user=db.DATABASE_USER,
+                                      password=db.DATABASE_PASSWORD,
+                                      host=db.DATABASE_HOST,
+                                      port=db.DATABASE_PORT)
+        # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
+        #                               user=db_local.DATABASE_USER,
+        #                               password=db_local.DATABASE_PASSWORD,
+        #                               host=db_local.DATABASE_HOST,
+        #                               port=db_local.DATABASE_PORT)
 
-        # ツイートリストが含まれたテキストファイルを読み込む。
-        f = open(tweet_file, 'r', encoding="utf_8_sig")
-        tweet_file_data = f.read()
-        f.close()
-
-        # ファイルから必要なデータのみ取り出す。
-        tweet_list_including_garbage = tweet_file_data.split('"')
-        tweet_list = list(filter(lambda s: s != '' and s != '\n', tweet_list_including_garbage))
+        dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        dict_cur.execute("SELECT tweet FROM regularly_tweet WHERE start_time <= %s AND end_time >= %s",
+                         (tweet_time, tweet_time))
+        tweet_list = list(dict_cur)
 
         # 直近のツイート最大20件を取得する。
         recently_tweet_list = self.get_user_timeline()
@@ -67,7 +78,7 @@ class Twitter:
         tweet_candidate = ""
         while not is_tweet_decision:
             # tweet_listの中からランダムにツイートを選択する。
-            tweet_candidate = random.choice(tweet_list)
+            tweet_candidate = random.choice(tweet_list)[0]
 
             # 同じ内容のツイートをしていないか、確認する。
             i = 0
@@ -82,12 +93,38 @@ class Twitter:
 
         return tweet_candidate
 
+    @staticmethod
+    def select_go_home_tweet_random():
+        # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
+        connection = psycopg2.connect(dbname=db.DATABASE_NAME,
+                                      user=db.DATABASE_USER,
+                                      password=db.DATABASE_PASSWORD,
+                                      host=db.DATABASE_HOST,
+                                      port=db.DATABASE_PORT)
+        # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
+        #                               user=db_local.DATABASE_USER,
+        #                               password=db_local.DATABASE_PASSWORD,
+        #                               host=db_local.DATABASE_HOST,
+        #                               port=db_local.DATABASE_PORT)
+
+        dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        dict_cur.execute("SELECT tweet "
+                         "FROM regularly_tweet "
+                         "WHERE start_time = '20:00:00'")
+        tweet_candidate = random.choice(list(dict_cur))[0]
+        return tweet_candidate
+
     def update(self, new_tweet, reply_id=None):
-        """new_tweetを投稿する。"""
+        """
+        ツイートを投稿する。
+        :param new_tweet: ツイート文字列
+        :param reply_id: リプライ先のスクリーンネーム（リプライの場合のみ指定する）
+        :return:
+        """
 
         # ツイートする。
         try:
-            self.api.update_status(status=new_tweet, in_reply_to_status_id=reply_id)
+            self._api.update_status(status=new_tweet, in_reply_to_status_id=reply_id)
             if reply_id is None:
                 print("Tweet succeeded")
             else:
@@ -96,17 +133,20 @@ class Twitter:
             print(e.reason)
 
     def reply_check(self):
-        """リプライに反応する。"""
+        """
+        リプライに反応する。
+        :return:
+        """
 
         # 前回からのリプライをすべて取得する。
-        mentions_statuses = self.api.mentions_timeline(since_id=self.previous_reply_id)
+        mentions_statuses = self._api.mentions_timeline(since_id=self._previous_reply_id)
 
         # リプライに1つずつ対応する。
         for mention in mentions_statuses:
             mention_id = mention.id  # リプライ先のツイートID
             mention_name = mention.author.screen_name  # リプライ相手のスクリーンネーム
             mention_text = mention.text.split(' ')
-            self.previous_reply_id = mention_id  # 前回リプライのIDを更新
+            self._previous_reply_id = mention_id  # 前回リプライのIDを更新
 
             print("Received reply, id: ", mention_id)
             print("Mention Name: ", mention_name)
@@ -130,7 +170,12 @@ class Twitter:
 
     @staticmethod
     def make_number_reply(screen_name, number):
-        """数字を判定してメッセージを返す。"""
+        """
+        引数で渡された数字を判定して適切なメッセージを返す。
+        :param screen_name: Twitterのスクリーンネーム
+        :param number: 判定する数字
+        :return: リプライ文字列
+        """
 
         reply = screen_name
         if len(str(number)) > 15:
@@ -147,9 +192,12 @@ class Twitter:
 
     @staticmethod
     def make_prime_message():
-        """毎日0:00にツイートするその日のよるほー＆素数情報メッセージを作成して返す。"""
+        """
+        毎日0:00にツイートする、よるほー＆素数情報メッセージを作成して返す。
+        :return: よるほーツイート
+        """
 
-        today = datetime.date.today()
+        today = date.today()
         # 西暦を文字列にして格納
         year = str(today.year)
 
@@ -176,6 +224,4 @@ class Twitter:
 
 if __name__ == '__main__':
     twitter = Twitter()
-    while True:
-        twitter.reply_check()
-        time.sleep(60)
+    print(twitter.select_tweet_random())

@@ -4,12 +4,16 @@ import psycopg2
 import psycopg2.extras
 from math import sqrt
 
-from izumin import db
+from izumin import db        # 本番環境ではこちら
 # from izumin import db_local  # ローカルでテストする際はコメントを外す。
 
 
 def is_prime(x):
-    """引数が素数であるか判定する。"""
+    """
+    引数が素数であればTrue、そうでなければFalseを返す。
+    :param x: 素数判定を行う数値
+    :return: 引数xが素数であるか
+    """
 
     if x < 2:  # 2未満は素数ではない。
         return False
@@ -31,10 +35,14 @@ def is_prime(x):
 
 
 def is_perfect_number(x):
-    """引数が完全数であるか判定する。"""
+    """
+    引数が完全数であればTrue、そうでなければFalseを返す。
+    :param x: 完全数判定を行う数値
+    :return: 引数xが完全数であるか
+    """
 
     # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
-    connection = psycopg2.connect(database=db.DATABASE_NAME,
+    connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,
                                   host=db.DATABASE_HOST,

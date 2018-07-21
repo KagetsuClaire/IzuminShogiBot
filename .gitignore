@@ -8,3 +8,5 @@ Scripts/
 pyvenv.cfg
 pip-selfcheck.json
 Include/
+latest.dump
+doc/
