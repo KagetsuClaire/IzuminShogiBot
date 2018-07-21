@@ -47,7 +47,7 @@ def is_perfect_number(x):
                                   password=db.DATABASE_PASSWORD,
                                   host=db.DATABASE_HOST,
                                   port=db.DATABASE_PORT)
-    # connection = psycopg2.connect(database=db_local.DATABASE_NAME,
+    # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
     #                               user=db_local.DATABASE_USER,
     #                               password=db_local.DATABASE_PASSWORD,
     #                               host=db_local.DATABASE_HOST,
