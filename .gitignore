@@ -10,3 +10,4 @@ pip-selfcheck.json
 Include/
 latest.dump
 doc/
+sql/

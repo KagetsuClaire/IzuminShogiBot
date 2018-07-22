@@ -149,7 +149,7 @@ class Twitter:
             self._previous_reply_id = mention_id  # 前回リプライのIDを更新
 
             print("Received reply, id: ", mention_id)
-            print("Mention Name: ", mention_name)
+            print("Mention name: ", mention_name)
             print("Message is 「", mention.text, "」")
 
             completed_reply = False
