@@ -53,9 +53,9 @@ def is_perfect_number(x):
     #                               host=db_local.DATABASE_HOST,
     #                               port=db_local.DATABASE_PORT)
 
-    dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    dict_cur.execute("SELECT number FROM perfect_number")
-    for row in dict_cur:
+    cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT number FROM perfect_number")
+    for row in cur:
         if x == row["number"]:
             return True
     else:

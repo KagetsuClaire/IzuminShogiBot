@@ -65,10 +65,10 @@ class Twitter:
         #                               host=db_local.DATABASE_HOST,
         #                               port=db_local.DATABASE_PORT)
 
-        dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        dict_cur.execute("SELECT tweet FROM regularly_tweet WHERE start_time <= %s AND end_time >= %s",
-                         (tweet_time, tweet_time))
-        tweet_list = list(dict_cur)
+        cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cur.execute("SELECT tweet FROM regularly_tweet WHERE start_time <= %s AND end_time >= %s",
+                    (tweet_time, tweet_time))
+        tweet_list = list(cur)
 
         # 直近のツイート最大20件を取得する。
         recently_tweet_list = self.get_user_timeline()
@@ -107,11 +107,11 @@ class Twitter:
         #                               host=db_local.DATABASE_HOST,
         #                               port=db_local.DATABASE_PORT)
 
-        dict_cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        dict_cur.execute("SELECT tweet "
-                         "FROM regularly_tweet "
-                         "WHERE start_time = '20:00:00'")
-        tweet_candidate = random.choice(list(dict_cur))[0]
+        cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cur.execute("SELECT tweet "
+                    "FROM regularly_tweet "
+                    "WHERE start_time = '20:00:00'")
+        tweet_candidate = random.choice(list(cur))[0]
         return tweet_candidate
 
     def update(self, new_tweet, reply_id=None):
@@ -216,7 +216,27 @@ class Twitter:
 
         status = "よるほー。大石泉が0時をお知らせするよ。今日の日付、\"" + str(today_number)
         if math.is_prime(today_number):
-            status += "\"は素数ね。"
+            # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
+            connection = psycopg2.connect(dbname=db.DATABASE_NAME,
+                                          user=db.DATABASE_USER,
+                                          password=db.DATABASE_PASSWORD,
+                                          host=db.DATABASE_HOST,
+                                          port=db.DATABASE_PORT)
+            # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
+            #                               user=db_local.DATABASE_USER,
+            #                               password=db_local.DATABASE_PASSWORD,
+            #                               host=db_local.DATABASE_HOST,
+            #                               port=db_local.DATABASE_PORT)
+            cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            # 前回の素数日を取り出す。
+            cur.execute("SELECT max(number), max(tweet_date) FROM number_history WHERE kind = 'prime'")
+            # 前回の素数日との差を計算する。
+            # ※もっときれいな方法がありそう
+            elapsed = str(today - cur.fetchone()[1]).split(' ')[0]
+            status += "\"は" + elapsed + "日ぶりの素数ね。"
+            cur.execute("INSERT INTO number_history (number, kind, tweet_date) "
+                        "VALUES (%s, %s, %s)", (today_number, 'prime', today))
+            connection.commit()
         else:
             status += "\"は素数じゃないわね。"
         return status
@@ -224,4 +244,4 @@ class Twitter:
 
 if __name__ == '__main__':
     twitter = Twitter()
-    print(twitter.select_tweet_random())
+    print(twitter.make_prime_message())
