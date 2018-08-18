@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import importlib
 import re
 import tweepy
 
-from izumin import key        # 本番環境ではこちら
-# from izumin import key_local  # ローカルではこちら
+from izumin import config
 from izumin import message
+
+if config.IS_PRODUCTION_ENVIRONMENT:
+    key = importlib.import_module("key")
+else:
+    key = importlib.import_module("key_local")
 
 
 class Twitter:
@@ -14,11 +19,8 @@ class Twitter:
     """
 
     def __init__(self):
-        # ローカルでテストする際はkeyをコメントアウトし、key_localのコメントを外す。
         self._auth = tweepy.OAuthHandler(key.CONSUMER_KEY, key.CONSUMER_SECRET)
         self._auth.set_access_token(key.ACCESS_TOKEN, key.ACCESS_SECRET)
-        # self._auth = tweepy.OAuthHandler(key_local.CONSUMER_KEY, key_local.CONSUMER_SECRET)
-        # self._auth.set_access_token(key_local.ACCESS_TOKEN, key_local.ACCESS_SECRET)
         self._api = tweepy.API(self._auth)
         self._previous_reply_id = self._api.mentions_timeline(count=1)[0].id
         print("Set previous reply id: ", self._previous_reply_id)
@@ -97,4 +99,4 @@ class Twitter:
 
 if __name__ == '__main__':
     twitter = Twitter()
-    print(message.make_prime_message())
+    print(message.select_random(twitter.get_user_timeline_max20()))

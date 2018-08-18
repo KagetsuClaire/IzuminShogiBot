@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import importlib
 import psycopg2
 import psycopg2.extras
 import random
 from datetime import date, datetime
 
-from izumin import db        # 本番環境ではこちら
-# from izumin import db_local  # ローカルではこちら
+from izumin import config
 from izumin import math
+
+if config.IS_PRODUCTION_ENVIRONMENT:
+    db = importlib.import_module("db")
+else:
+    db = importlib.import_module("db_local")
 
 
 def select_random(exclude_message_list):
@@ -19,17 +24,11 @@ def select_random(exclude_message_list):
     """
 
     post_time = datetime.now().strftime("%H:%M:%S")
-    # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
     connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,
                                   host=db.DATABASE_HOST,
                                   port=db.DATABASE_PORT)
-    # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
-    #                               user=db_local.DATABASE_USER,
-    #                               password=db_local.DATABASE_PASSWORD,
-    #                               host=db_local.DATABASE_HOST,
-    #                               port=db_local.DATABASE_PORT)
 
     cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute("SELECT post_message FROM regularly_post WHERE start_time <= %s AND end_time >= %s",
@@ -59,17 +58,11 @@ def select_go_home_random():
     :return: ランダムに選ばれたメッセージ文字列
     """
 
-    # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
     connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,
                                   host=db.DATABASE_HOST,
                                   port=db.DATABASE_PORT)
-    # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
-    #                               user=db_local.DATABASE_USER,
-    #                               password=db_local.DATABASE_PASSWORD,
-    #                               host=db_local.DATABASE_HOST,
-    #                               port=db_local.DATABASE_PORT)
 
     cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute("SELECT post_message "
@@ -104,17 +97,11 @@ def make_prime_message():
 
     status = "よるほー。大石泉が0時をお知らせするよ。今日の日付、\"" + str(today_number)
     if math.is_prime(today_number):
-        # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
         connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                       user=db.DATABASE_USER,
                                       password=db.DATABASE_PASSWORD,
                                       host=db.DATABASE_HOST,
                                       port=db.DATABASE_PORT)
-        # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
-        #                               user=db_local.DATABASE_USER,
-        #                               password=db_local.DATABASE_PASSWORD,
-        #                               host=db_local.DATABASE_HOST,
-        #                               port=db_local.DATABASE_PORT)
         cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         # 前回の素数日を取り出す。
         cur.execute("SELECT max(number), max(post_date) FROM number_history WHERE kind = 'prime'")

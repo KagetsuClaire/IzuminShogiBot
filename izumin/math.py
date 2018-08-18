@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import importlib
 import psycopg2
 import psycopg2.extras
 from math import sqrt
 
-from izumin import db        # 本番環境ではこちら
-# from izumin import db_local  # ローカルでテストする際はコメントを外す。
+from izumin import config
+
+if config.IS_PRODUCTION_ENVIRONMENT:
+    db = importlib.import_module("db")
+else:
+    db = importlib.import_module("db_local")
 
 
 def is_prime(x):
@@ -41,17 +46,11 @@ def is_perfect_number(x):
     :return: 引数xが完全数であるか
     """
 
-    # ローカルでテストする際はdbをコメントアウトし、db_localのコメントを外す。
     connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,
                                   host=db.DATABASE_HOST,
                                   port=db.DATABASE_PORT)
-    # connection = psycopg2.connect(dbname=db_local.DATABASE_NAME,
-    #                               user=db_local.DATABASE_USER,
-    #                               password=db_local.DATABASE_PASSWORD,
-    #                               host=db_local.DATABASE_HOST,
-    #                               port=db_local.DATABASE_PORT)
 
     cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute("SELECT number FROM perfect_number")

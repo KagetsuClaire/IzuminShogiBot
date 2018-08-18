@@ -29,5 +29,3 @@ while True:
         time.sleep(60 - now.second)
     else:
         time.sleep(60)
-else:
-    print("Exit")
