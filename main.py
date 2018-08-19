@@ -3,8 +3,7 @@
 import time
 from datetime import datetime
 
-from izumin import twitter
-from izumin import message
+from izumin import message, twitter
 
 twitter = twitter.Twitter()
 while True:

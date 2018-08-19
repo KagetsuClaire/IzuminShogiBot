@@ -4,13 +4,12 @@ import importlib
 import re
 import tweepy
 
-from izumin import config
-from izumin import message
+from izumin import config, message
 
 if config.IS_PRODUCTION_ENVIRONMENT:
-    key = importlib.import_module("key")
+    key = importlib.import_module("izumin.key")
 else:
-    key = importlib.import_module("key_local")
+    key = importlib.import_module("izumin.key_local")
 
 
 class Twitter:

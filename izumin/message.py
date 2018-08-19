@@ -6,13 +6,12 @@ import psycopg2.extras
 import random
 from datetime import date, datetime
 
-from izumin import config
-from izumin import math
+from izumin import config, math
 
 if config.IS_PRODUCTION_ENVIRONMENT:
-    db = importlib.import_module("db")
+    db = importlib.import_module("izumin.db")
 else:
-    db = importlib.import_module("db_local")
+    db = importlib.import_module("izumin.db_local")
 
 
 def select_random(exclude_message_list):

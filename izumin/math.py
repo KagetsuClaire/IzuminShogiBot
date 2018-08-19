@@ -8,9 +8,9 @@ from math import sqrt
 from izumin import config
 
 if config.IS_PRODUCTION_ENVIRONMENT:
-    db = importlib.import_module("db")
+    db = importlib.import_module("izumin.db")
 else:
-    db = importlib.import_module("db_local")
+    db = importlib.import_module("izumin.db_local")
 
 
 def is_prime(x):
