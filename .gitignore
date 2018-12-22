@@ -1,5 +1,5 @@
 .idea/
-Contents/image/quiz.pptx
+contents/image/quiz.pptx
 izumin/__pycache__/
 izumin/db_local.py
 izumin/key_local.py

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from datetime import date, datetime
 import importlib
 import psycopg2
 import psycopg2.extras
 import random
-from datetime import date, datetime
 
 from izumin import config, math
 
@@ -21,7 +21,6 @@ def select_random(exclude_message_list):
     :param exclude_message_list: 除外するメッセージのリスト
     :return: ランダムに選ばれたメッセージ文字列
     """
-
     post_time = datetime.now().strftime("%H:%M:%S")
     connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
@@ -41,10 +40,10 @@ def select_random(exclude_message_list):
         # message_listの中からランダムにメッセージを選択する。
         message_candidate = random.choice(message_list)[0]
 
-        # 同じ内容の投稿をしていないか、確認する。
+        # 除外するメッセージのリストに含まれていないか確認する。
         for i in range(0, len(exclude_message_list)):
             if exclude_message_list[i] == message_candidate:
-                break  # 直近の投稿に今回のメッセージ候補が入っていたら選び直す。
+                break  # 選び直す。
         else:
             is_post_decision = True
 
@@ -56,7 +55,6 @@ def select_go_home_random():
     データベースに保存されている帰宅メッセージ候補からランダムで1つ選んで返す。
     :return: ランダムに選ばれたメッセージ文字列
     """
-
     connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,
@@ -76,7 +74,6 @@ def make_prime_message():
     毎日0:00に投稿する、よるほー＆素数情報メッセージを作成して返す。
     :return: よるほーメッセージ
     """
-
     today = date.today()
     # 西暦を文字列にして格納
     year = str(today.year)
@@ -123,7 +120,6 @@ def make_number_reply(screen_name, number):
     :param number: 判定する数字
     :return: リプライ文字列
     """
-
     reply = screen_name
     if len(str(number)) > 15:
         reply += "ごめんね。ちょっとわからないな。"

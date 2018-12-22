@@ -2,6 +2,7 @@
 
 import importlib
 import re
+
 import tweepy
 
 from izumin import config, message
@@ -14,7 +15,7 @@ else:
 
 class Twitter:
     """
-    Twitterを操作するクラス
+    Twitterアカウントを操作するクラス
     """
 
     def __init__(self):
@@ -24,12 +25,11 @@ class Twitter:
         self._previous_reply_id = self._api.mentions_timeline(count=1)[0].id
         print("Set previous reply id: ", self._previous_reply_id)
 
-    def get_user_timeline_max20(self):
+    def user_timeline_recently_max20(self):
         """
         直近の自分のツイート最大20件を取得し、リスト形式にして返す。
         :return: 直近の自分のツイート最大20件のリスト
         """
-
         user_timeline_status = self._api.user_timeline()
         recently_tweet_num = len(user_timeline_status)  # 直近ツイート件数（基本は20件だが、ツイート数が20未満の場合はその数になる）
 
@@ -48,8 +48,6 @@ class Twitter:
         :param reply_id: リプライ先のスクリーンネーム（リプライの場合のみ指定する）
         :return:
         """
-
-        # ツイートする。
         try:
             self._api.update_status(status=new_tweet, in_reply_to_status_id=reply_id)
             if reply_id is None:
@@ -59,12 +57,11 @@ class Twitter:
         except tweepy.TweepError as e:
             print(e.reason)
 
-    def reply_check(self):
+    def check_reply(self):
         """
         リプライに反応する。
         :return:
         """
-
         # 前回からのリプライをすべて取得する。
         mentions_statuses = self._api.mentions_timeline(since_id=self._previous_reply_id)
 
@@ -97,5 +94,4 @@ class Twitter:
 
 
 if __name__ == '__main__':
-    twitter = Twitter()
-    print(message.select_random(twitter.get_user_timeline_max20()))
+    pass

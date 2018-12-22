@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import importlib
+from math import sqrt
 import psycopg2
 import psycopg2.extras
-from math import sqrt
 
 from izumin import config
 
@@ -19,7 +19,6 @@ def is_prime(x):
     :param x: 素数判定を行う数値
     :return: 引数xが素数であるか
     """
-
     if x < 2:  # 2未満は素数ではない。
         return False
     if x == 2 or x == 3 or x == 5:  # 2,3,5は素数である。
@@ -45,7 +44,6 @@ def is_perfect_number(x):
     :param x: 完全数判定を行う数値
     :return: 引数xが完全数であるか
     """
-
     connection = psycopg2.connect(dbname=db.DATABASE_NAME,
                                   user=db.DATABASE_USER,
                                   password=db.DATABASE_PASSWORD,
