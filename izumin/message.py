@@ -120,7 +120,7 @@ def make_number_reply(screen_name, number):
     :param number: 判定する数字
     :return: リプライ文字列
     """
-    reply = screen_name
+    reply = screen_name + " "
     if len(str(number)) > 15:
         reply += "ごめんね。ちょっとわからないな。"
     elif math.is_perfect_number(number):
