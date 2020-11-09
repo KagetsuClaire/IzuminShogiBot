@@ -29,7 +29,10 @@ def select_random(exclude_message_list):
                                   port=db.DATABASE_PORT)
 
     cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cur.execute("SELECT post_message FROM regularly_post WHERE start_time <= %s AND end_time >= %s",
+    cur.execute("SELECT post_message "
+                "FROM regularly_post "
+                "WHERE delete_flag = false "
+                "AND start_time <= %s AND end_time >= %s ",
                 (post_time, post_time))
     message_list = list(cur)
 
@@ -64,7 +67,8 @@ def select_go_home_random():
     cur = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur.execute("SELECT post_message "
                 "FROM regularly_post "
-                "WHERE start_time = '20:00:00'")
+                "WHERE delete_flag = false "
+                "AND start_time = '20:00:00'")
     tweet_candidate = random.choice(list(cur))[0]
     return tweet_candidate
 
